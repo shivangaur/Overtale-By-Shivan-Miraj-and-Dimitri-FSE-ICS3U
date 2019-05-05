@@ -33,6 +33,10 @@ musicChannel = mixer.Channel(0)#making a mixer
 introMusic = mixer.Sound("Sound/intro.ogg")
 musicChannel.play(introMusic)
 
+#making a clock
+myClock = time.Clock()
+myCLock.tick(60)#making the program run 60 times per second
+
 #opening text files
 introText = open("Text/intro text.txt","r")#opening intro slides' text
 slideTexts = introText.readlines()#getting a list of each line(slide) of dialogue
@@ -123,23 +127,16 @@ def moveGuy(guy):
     if keys[K_DOWN] and guy[Y]<800:
         if checkPixelX(480,481,guyPic.get_width(),BLACK):
             guy[Y]+=10
+            
 running = True         
-myClock = time.Clock()
 while running:
     for evnt in event.get():                
         if evnt.type == QUIT:
             running = False
+            
     moveGuy(guy)
     drawScene(screen,guy)
     myClock.tick(60) 
-running = True
-while running:
-    for evt in event.get():
-        if evt.type == QUIT:
-            running = False
-                       
-    mb = mouse.get_pressed()
-    mx,my = mouse.get_pos()
 
 quit()
 
