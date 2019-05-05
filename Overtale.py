@@ -81,7 +81,7 @@ for i in range(7):
 for i in range(4):
     drawPictures(image.load("Pictures/Intro slides/intro"+str(i+7)+".jpg"))#drawing the pictures 7 through 9,adding 7 because the pictures are labeled in the folder in order of the slides
 
-intro11 = image.load("Pictures/Intro Slides/intro112.jpg")#loading final image, this does not get a function because it is simpler to just do it without one, as it is only one picture
+intro11 = image.load("Pictures/Intro Slides/intro11.jpg")#loading final image, this does not get a function because it is simpler to just do it without one, as it is only one picture
 screen.blit(intro11,(130,-527))#blit the picture at 100,-627, as the picture is 924 tall, and we only want to show the bottom 297 pixels at this point so it matches the other pictures
 display.flip()
 time.wait(2000)#wait 2000 millaseconds
