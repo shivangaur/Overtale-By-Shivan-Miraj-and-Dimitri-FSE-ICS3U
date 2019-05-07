@@ -1,3 +1,4 @@
+
 #importing what the program needs
 from pygame import *
 from random import *
@@ -114,22 +115,24 @@ def moveGuy(guy):
         if checkPixelX(480,481,guyPic.get_width(),BLACK):
             guy[Y]+=10
 
-for i in range(7):
+for i in range(8):
     drawSlides(slideTexts[i],image.load("Pictures/introPics/intro"+str(i+1)+".jpg"))#draw the slides 1 through 6, adding 1 because the for loop starts at 0 and ends at 5
    
-for i in range(4):
-    drawPictures(image.load("Pictures/introPics/intro"+str(i+7)+".jpg"))#drawing the pictures 7 through 9,adding 7 because the pictures are labeled in the folder in order of the slides
+for i in range(3):
+    drawPictures(image.load("Pictures/introPics/intro"+str(i+8)+".jpg"))#drawing the pictures 7 through 9,adding 7 because the pictures are labeled in the folder in order of the slides
 
 intro11 = image.load("Pictures/introPics/intro11.jpg")#loading final image, this does not get a function because it is simpler to just do it without one, as it is only one picture
-screen.blit(intro11,(200,-928))#blit the picture at 200,-627, as the picture is 924 tall, and we only want to show the bottom 297 pixels at this point so it matches the other pictures
+screen.blit(intro11,(100,-828))#blit the picture at 100,-928, as the picture is 1368 tall, and we only want to 500 pixels at this point so it matches the other pictures
+draw.rect(screen,BLACK,(100,0,800,100))
 display.flip()
 time.wait(2000)#wait 2000 millaseconds
 
-for i in range(1368):
-    screen.blit(intro11,(100,-928+i))#draw the picture 1 pixel lower
-    draw.rect(screen,BLACK,(100,440,800,400))#draw a rect below the picture so that when it starts coming down you only see 297 vertical pixels of picture
+for i in range(828):
+    screen.blit(intro11,(100,-828+i))#draw the picture 1 pixel lower
+    draw.rect(screen,BLACK,(100,0,800,100))
+    draw.rect(screen,BLACK,(100,540,800,400))#draw a rect below the picture so that when it starts coming down you only see 297 vertical pixels of picture
     display.flip()#show all this
-time.wait(1000)
+time.wait(10000)
 musicChannel.pause()
             
 running = True         
