@@ -20,6 +20,7 @@ WHITE = (255,255,255)
 #declaring character's x and y position and making a list of them
 X = 0 #character's x position
 Y = 1 #character's y position
+S  = 0
 #there is no "vy" or jumping power because there is no jumping in the game
     #X  Y 
 guy = [X,Y,480,400]
@@ -34,7 +35,7 @@ comicSansFont = font.SysFont("Consolas",40)#loading comic sans font
 mixer.init()
 musicChannel = mixer.Channel(0)#making a mixer
 introMusic = mixer.Sound("Sound/introMusic/intro.ogg")
-musicChannel.play(introMusic)
+#musicChannel.play(introMusic)
 
 #making a clock
 myClock = time.Clock()
@@ -99,10 +100,25 @@ def checkPixelY(x,y,h,col):
     '''returns the colour of the pixel at current (x,y)'''
     cond = True
     for i in range(h):
+       # print(screen.get_at((x,y+i)))
         if screen.get_at((x,y+i))== col:
+            
             cond = False
     return cond
-
+def floweyScene(guy,picsList):
+    frame=0
+    guy[X]=0
+    guy[Y]=0
+    guy[2]=480
+    guy[3]=500
+    print(guy[3])
+    while guy[3]>480:
+       # frame+=0.2
+        guy[3]-=1
+    screen.blit(picsList[2][int(frame)],(guy[2],guy[3]))
+    
+        
+        
 def addPics(name,start,end):
     '''this function will return a LIST OF PICTURES
     They must be in a folder named 'name' and all the pictures must start with 'name'
@@ -113,18 +129,15 @@ def addPics(name,start,end):
         myPics.append(image.load("Pictures/%s/%s%03d.png"%(name,name,i)))
     return myPics
 
-def drawScene(screen,picsList,backPics,guy,S):
+def drawScene(screen,picsList,backPics,guy):
     #print(S)
+    global S
     if guy[X]<=-190 and guy[Y]<=-50:
         screen.blit(backPics[S],(190,50))
     elif 1510<guy[X]<1620 and guy[Y]<=41:
         S+=1
-        guy[X]=0
-        guy[Y]=0
-        
-        guy[2]=480
-        guy[3]=400
-        screen.blit(backPics[S],(190,50))
+        floweyScene(guy,picsList)
+        #screen.blit(backPics[S],(190,50))
         #screen.blit(backPics[S],(0,0))
         #draw.rect(screen,BLACK,(0,0,width,height))
     elif guy[X]<=-190:
@@ -163,6 +176,7 @@ def moveGuy(guy):
             
     elif keys[K_RIGHT] and guy[X]<2267:
         if checkPixelY(guy[2]+52,guy[3],guyPic.get_height(),BLACK):
+            
             if guy[X]<=-190:
                 guy[2]+=10
             if guy[X]>=1220:
@@ -184,6 +198,7 @@ def moveGuy(guy):
             
     elif keys[K_DOWN] and guy[Y]<800:
         if checkPixelX(guy[2],guy[3]+81,guyPic.get_width(),BLACK):
+            
             if guy[Y]<=-50:
                 guy[3]+=10
             guy[Y]+=10
@@ -227,7 +242,7 @@ while running:
             running = False
             
     moveGuy(guy)
-    drawScene(screen,pics,backPics,guy,0)
+    drawScene(screen,pics,backPics,guy)
     myClock.tick(60)
 
 quit()
