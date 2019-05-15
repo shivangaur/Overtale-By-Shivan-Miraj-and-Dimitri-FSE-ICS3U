@@ -21,7 +21,7 @@ X = 0 #character's x position
 Y = 1 #character's y position
 S  = 0
 #there is no "vy" or jumping power because there is no jumping in the game
-    #X  Y 
+    #X  Y  
 guy = [X,Y,480,400]
 
 move=0
