@@ -58,8 +58,8 @@ def drawPellets():
     for i in range(50,250,5):
         ellipseRect1=Rect(485-i,130,20,20)
         ellipseRect2=Rect(485+i,130,20,20)
-        draw.ellipse(screen,WHITE,(ellipseRect1),10)
-        draw.ellipse(screen,WHITE,(ellipseRect2),10)
+        draw.ellipse(screen,WHITE,(ellipseRect1))
+        draw.ellipse(screen,WHITE,(ellipseRect2))
         display.flip()
         screenshot = screen.copy()
         screen.blit(floweyCombat,(0,0))
@@ -71,9 +71,9 @@ def drawPellets():
         ellipseRect3=Rect(485-2*i,130-i,20,20)
         ellipseRect4=Rect(485+2*i,130-i,20,20)
         ellipseRect5=Rect(485,150-i-50,20,20)
-        draw.ellipse(screen,WHITE,(ellipseRect3),10)
-        draw.ellipse(screen,WHITE,(ellipseRect4),10)
-        draw.ellipse(screen,WHITE,(ellipseRect5),10)
+        draw.ellipse(screen,WHITE,(ellipseRect3))
+        draw.ellipse(screen,WHITE,(ellipseRect4))
+        draw.ellipse(screen,WHITE,(ellipseRect5))
         display.flip()
         screen.blit(textBox,(600,175))
         screen.blit(normalFlowey,(389,155))
@@ -87,7 +87,7 @@ def floweyFont(text):
     fx = 650
     fy = 195
     count = 0
-    if text == floweyScript[7]:
+    if text == floweyScript[1]:
         drawPellets()
     for char in text:
         if pellets:
