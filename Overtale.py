@@ -37,7 +37,9 @@ MOVEUP=19
 #                          coordinates
 #                           for scene
 guy = [X,Y,480,400,S,0,MAXX,2267,MAXY,800,MINX,-480,MINY,-400,MOVEL,-190,MOVER,1220,MOVEUP,-50]
-
+                                                                                            #GX GY SX  SY  MX   MX  MY MOVEL MOVER MAXX MAXY
+scenes=[[0,0,480,400,1490,1630,41,-190,1220,2267,800],[0,600,480,400,1,1000,550,0,0,460,930],[0,600,480,400,1,1000,550,0,0,460,930]]
+#resets=(
 move=0
 frame=0
 #initializing font
@@ -63,7 +65,7 @@ slideTexts = introText.readlines()#getting a list of each line(slide) of dialogu
 
 guyPic = image.load("Pictures/guy/guy.png")#29x31
 openPic=image.load('Pictures/introPics/opening.jpg')
-heartPic = image.load("pictures/heart.png")
+heartPic = image.load("Pictures/heart.png")
 HX = 475
 HY = 475
 heart = [HX,HY,100,100]
@@ -206,6 +208,23 @@ def fade(width, height,col):
         display.update()
         time.delay(5)
         
+def transCool(width,height,col):
+    for i in range(0,width+50,50):
+        for j in range(0,height+50,50):
+            #draw.rect(screen,BLACK,(0,0,i,j))
+            draw.circle(screen,BLUE,(i,j),29)
+            #draw.circle(screen,BLACK,(i-50,j),25)
+            time.wait(5)
+            display.flip()
+    for i in range(0,height+50,50):
+        for j in range(0,width+50,50):
+            #draw.rect(screen,BLACK,(0,0,i,j))
+            draw.circle(screen,WHITE,(j,i),35)
+            #draw.circle(screen,BLACK,(i-50,j),25)
+            time.wait(5)
+            display.flip()
+    fade(width,height,BLACK)
+        
 def moveGuy(guy,writing):
     
     global move,frame
@@ -250,17 +269,17 @@ def moveGuy(guy,writing):
         elif newMove!=-1:
             move=newMove
             frame=1
-def floweyScene(guy,script):
-    guy[X]=0
-    guy[Y]=600
-    guy[2]=480
-    guy[3]=400
-    guy[MOVEL]=0
-    guy[MOVER]=0
-    guy[MAXX]=460
-    guy[MAXY]=930
-    guy[S]+=1
-    return True
+##def floweyScene(guy,script):
+##    guy[X]=0
+##    guy[Y]=600
+##    guy[2]=480
+##    guy[3]=400
+##    guy[MOVEL]=0
+##    guy[MOVER]=0
+##    guy[MAXX]=460
+##    guy[MAXY]=930
+##    guy[S]+=1
+##    return True
     
     
    # screen.blit(backPics[guy[S]]
@@ -272,40 +291,63 @@ def drawPellets(heartRect,pellets):
 #def movePellets(pellets):
     
     
-def floweyEncounter(picsList,guy):
+def floweyEncounter(picsList,guy,mono2):
+    
+            
+##    if mono2:
+##        writing=False
+##        textBox(40,20,'flowey')
+##        for text in script:
+##            drawFont(text,'flowey',180,50)
+##            writing=False
+##            x=script.index(text)
+##                    
+##            if x==len(script)-1:
+##                mono2=False
     #for i in range(3):
-    screen.fill(BLACK)
-    screen.blit(heartPic,(guy[2],guy[3]))
-    display.update()
-    time.delay(5)
-    screen.blit(picsList[2][0],(guy[2],guy[3]))
+    heartPhase(guy,picsList)
     guy[S]+=1
-    guy[X]=0
-    guy[Y]=600
-    guy[2]=480
-    guy[3]=400
+##    guy[X]=0
+##    guy[Y]=600
+##    guy[2]=480
+##    guy[3]=400
     
 mono2=True
+def heartPhase(guy,picsList):
+    for i in range(10):
+        screen.fill(BLACK)
+        time.wait(100)
+        display.flip()
+        screen.blit(picsList[2][0],(guy[2],guy[3]))
+        time.wait(100)
+        display.flip()
+        screen.fill(BLACK)
+        time.wait(100)
+        display.flip()
+        screen.blit(heartPic,(guy[2]+5,guy[3]+5))
+        
+        
+        
+        display.flip()
+        
 def drawScene(screen,picsList,backPics,guy,combat):
     global mono2
     mono=False
-    #print(len(backPics))
-    #cond=0w
-    #print(guy) 
-   # global S #what scene the character is in
-    #if gateRect.collideRect(guy):#if they are moving to the next level
-        #S+=1#mvoe to the next scene
     if guy[X]<=-190 and guy[Y]<=-50:#the rest of the lines are chekcing where the character is, because if they are too far into one part of the scene we want to move the CHARACTER and NOT the background picture
         screen.blit(backPics[guy[S]],(190,50))
-    elif 1490<guy[X]<1630 and guy[Y]<41:
-        #mono='no'
+
+    elif scenes[guy[S]][4]<guy[X]<scenes[guy[S]][5] and guy[Y]<scenes[guy[S]][6]:
         fade(1000,750,BLACK)
-        #transScene()
-        mono=floweyScene(guy,script)
-        
-        
-        
-        
+        guy[S]+=1
+        guy[X]=scenes[guy[S]][0]
+        guy[Y]=scenes[guy[S]][1]
+        guy[2]=scenes[guy[S]][2]
+        guy[3]=scenes[guy[S]][3]
+        guy[MOVEL]=scenes[guy[S]][7]
+        guy[MOVER]=scenes[guy[S]][8]
+        guy[MAXX]=scenes[guy[S]][9]
+        guy[MAXY]=scenes[guy[S]][10]
+ 
     elif guy[X]<=guy[MOVEL]-10:
         screen.blit(backPics[guy[S]],(-(guy[MOVEL]-10),-guy[Y]))
     elif guy[X]>=guy[MOVER]:
@@ -315,26 +357,13 @@ def drawScene(screen,picsList,backPics,guy,combat):
     else:
         screen.blit(backPics[guy[S]],(-guy[X],-guy[Y]))
     screen.blit(picsList[move][int(frame)],(guy[2],guy[3]))
-   # print(mono)
+    checkEncounter(guy,mono2,picsList)
+    
+    display.flip()
+def checkEncounter(guy,mono2,picsList):
     if guy[S]==1:
         if guy[Y]<550:
-            
-            
-            if mono2:
-                writing=False
-                textBox(40,20,'flowey')
-                for text in script:
-                    #writing=True
-                    drawFont(text,'flowey',180,50)
-                    writing=False
-                    x=script.index(text)
-                    #print(x,len(script))
-                    
-                    if x==len(script)-1:
-                        mono2=False
-            floweyEncounter(picsList,guy)
-
-    display.flip()
+            floweyEncounter(picsList,guy,mono2)
 def drawIntro():
    myClock=time.Clock()
    running=True
@@ -345,7 +374,7 @@ def drawIntro():
     screen.blit(openPic,(0,0))
     keys=key.get_pressed()
     if keys[K_RETURN]:
-        fade(width,height,BLACK)
+        transCool(width,height,BLUE)
         break
 
     
@@ -376,14 +405,13 @@ def chooseName():
         for evnt in event.get():                
             if evnt.type == QUIT:
                 running = False
-       # screen.blit(openPic,(0,0))
+       
         keys=key.get_pressed()
         for i in range(1,5):
             for j in range(1,8):
                 
                 coords.append((100*((j%8)+1),50*i+100))
-        #if count==0:
-        #print(coords[posr*7][1]+5)
+        
         for coor in coords:
             x=coords.index(coor)
             let=consolas.render(lets[x],True,WHITE)
@@ -400,48 +428,27 @@ def chooseName():
         else:
             letters=store
             case=0
-        print(case)
+        
         if keys[K_TAB]:
             fade(width,height,WHITE)
-            #screen.fill(BLACK)
+        
             break
         
         
         
-        #print(posr,posc)
+  
         if keys[K_UP]:
             if posr>0:
-                #print(coords[posc+posr][0]+7,coords[posc+posr][1]+5)
                 posr-=1
         if keys[K_DOWN]:
             if posr<3:
-                #print(coords[posc+posr][0]+7,coords[posc+posr][1]+5)
                 posr+=1
         if keys[K_LEFT]:
             if posc>0:
-                #print(coords[posc+posr][0]+7,coords[posc+posr][1]+5)
                 posc-=1
         if keys[K_RIGHT]:
             if posc<6:
-                #print(coords[posc+posr][0]+7,coords[posc+posr][1]+5)
                 posc+=1
-##        if keys[K_w]:
-##            if lowr>0:
-##                #print(coords[posc+posr][0]+7,coords[posc+posr][1]+5)
-##                lowr-=1
-##        if keys[K_s]:
-##            if lowr<3:
-##                #print(coords[posc+posr][0]+7,coords[posc+posr][1]+5)
-##                lowr+=1
-##            else:
-##        if keys[K_a]:
-##            if lowc>0:
-##                #print(coords[posc+posr][0]+7,coords[posc+posr][1]+5)
-##                lowc-=1
-##        if keys[K_d]:
-##            if lowc<6:
-##                #print(coords[posc+posr][0]+7,coords[posc+posr][1]+5)
-##                lowc+=1
         high=consolas.render(letters[posr][posc],True,(255,255,0))
         #screen.blit(high,(coords
         #print(posr,posc)
@@ -460,35 +467,38 @@ def chooseName():
         myClock.tick(60)
         
         display.flip()
-drawIntro()
-chooseName()
 
-for i in range(8):
-    if i!=7:
-        drawSlides(slideTexts[i],image.load("Pictures/introPics/intro"+str(i+1)+".jpg"))#draw the slides 1 through 6, adding 1 because the for loop starts at 0 and ends at 5
-   
-for i in range(3):
-    drawPictures(image.load("Pictures/introPics/intro"+str(i+8)+".jpg"))#drawing the pictures 7 through 9,adding 7 because the pictures are labeled in the folder in order of the slides
+screen.fill(BLACK)
 
-intro11 = image.load("Pictures/introPics/intro11.jpg")#loading final image, this does not get a function because it is simpler to just do it without one, as it is only one picture
-screen.blit(intro11,(175,-550))#blit the picture at 100,-550, as the picture is 1368 tall, and we only want to 500 pixels at this point so it matches the other pictures
-draw.rect(screen,BLACK,(175,0,800,100))
-display.flip()
-time.wait(2000)#wait 2000 millaseconds
 
-for i in range(550):
-    screen.blit(intro11,(175,-550+i))#draw the picture 1 pixel lower
-    draw.rect(screen,BLACK,(175,0,800,100))
-    draw.rect(screen,BLACK,(175,550,800,400))#draw a rect below the picture so that when it starts coming down you only see 297 vertical pixels of picture
-    display.flip()#show all this
-time.wait(5000)
-musicChannel.pause()
-    
+##for i in range(8):
+##        if i!=7:
+##            drawSlides(slideTexts[i],image.load("Pictures/introPics/intro"+str(i+1)+".jpg"))#draw the slides 1 through 6, adding 1 because the for loop starts at 0 and ends at 5
+##           
+##for i in range(3):
+##        drawPictures(image.load("Pictures/introPics/intro"+str(i+8)+".jpg"))#drawing the pictures 7 through 9,adding 7 because the pictures are labeled in the folder in order of the slides
+##
+##intro11 = image.load("Pictures/introPics/intro11.jpg")#loading final image, this does not get a function because it is simpler to just do it without one, as it is only one picture
+##screen.blit(intro11,(175,-550))#blit the picture at 100,-550, as the picture is 1368 tall, and we only want to 500 pixels at this point so it matches the other pictures
+##draw.rect(screen,BLACK,(175,0,800,100))
+##display.flip()
+##time.wait(2000)#wait 2000 millaseconds
+##
+##for i in range(550):
+##        screen.blit(intro11,(175,-550+i))#draw the picture 1 pixel lower
+##        draw.rect(screen,BLACK,(175,0,800,100))
+##        draw.rect(screen,BLACK,(175,550,800,400))#draw a rect below the picture so that when it starts coming down you only see 297 vertical pixels of picture
+##        display.flip()#show all this
+##time.wait(5000)
+##musicChannel.pause()
+
+#drawIntro()
+#chooseName()
 pics=[addPics('guy',1,3),
     addPics("guy",4,6),addPics('guy',7,9),addPics('guy',10,12)]            
 
 combat=False
-running = True         
+running=True
 while running:
     for evnt in event.get():                
         if evnt.type == QUIT:
