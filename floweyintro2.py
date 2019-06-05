@@ -81,8 +81,9 @@ def drawFloweyScene(count,fx,fy,text,k,j,i,floweyScript,heart):
     screen.blit(floweyCombat,(0,0))
     screen.blit(textBox,(600,175))
     screen.blit(heartPic,(heart[X]-25,heart[Y]-25))
-    if j == 0 and i == 0:
-        draw.rect(screen,WHITE,(650,190,285,141))
+    if j == 0 and i == 0 and count % 12 == 0:
+        screen.blit(textBox,(600,175))
+        #draw.rect(screen,WHITE,(650,190,285,141))
     else:
         if screenVar:
             screen.blit(screenshot,(600,175))
@@ -132,6 +133,7 @@ def floweyFight():
         else:
             if count % 12 == 0: 
                 fx+=15
+        print(fx)
         if count % 12 == 0:
             if not i+1 == len(floweyScript[k][j]):
                 i+=1
@@ -139,7 +141,8 @@ def floweyFight():
                 i = 0
                 if not j+1 == len(floweyScript[k]):
                     j+=1
-                    fx+=18
+                    if fx != 650:
+                        fx+=18
                 else:
                     j = 0
                     if not k+1 == len(floweyScript):
