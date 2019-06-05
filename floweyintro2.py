@@ -38,7 +38,7 @@ def make3D(text):
     word = []
     for i in script:
         for j in i:
-            if j.isalpha():
+            if j.isalpha() or j == "?" or j == "!" or j == "'" or j == "," or j == ".":
                 word.append(j)
             else:
                 if len(word)>0:
@@ -79,9 +79,13 @@ def drawFloweyScene(count,fx,fy,text,k,j,i,floweyScript,heart):
     global screenVar
     global screenshot
     screen.blit(floweyCombat,(0,0))
+    screen.blit(textBox,(600,175))
     screen.blit(heartPic,(heart[X]-25,heart[Y]-25))
-    if screenVar:
-        screen.blit(screenshot,(600,175))
+    if j == 0 and i == 0:
+        draw.rect(screen,WHITE,(650,190,285,141))
+    else:
+        if screenVar:
+            screen.blit(screenshot,(600,175))
     if count % 30 == 0 and text:
         screen.blit(floweyTalking,(389,155))
     else:
@@ -92,7 +96,7 @@ def drawFloweyScene(count,fx,fy,text,k,j,i,floweyScript,heart):
 ##        if not musicChannel2.get_busy():
 ##            musicChannel2.play(floweyTheme)
         if count % 12 == 0:
-            character = consolas.render(floweyScript[k][j][i],True,WHITE)
+            character = consolas.render(floweyScript[k][j][i],True,BLACK)
             screen.blit(character,(fx,fy))
             screenVar = True
     display.flip()
@@ -122,7 +126,7 @@ def floweyFight():
         moveHeart(heart)
         drawFloweyScene(count,fx,fy,text,k,j,i,floweyScript,heart)
         count+=1
-        if fx>=925:
+        if fx>=900:
             fx = 650
             fy+=35
         else:
@@ -142,7 +146,6 @@ def floweyFight():
                         k+=1
                         fx = 650
                         fy = 200
-                        screenVar = False
                     else:
                         k = 0
                         text = False
