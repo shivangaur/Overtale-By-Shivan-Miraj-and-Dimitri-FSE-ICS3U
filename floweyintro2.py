@@ -16,7 +16,8 @@ musicChannel = mixer.Channel(0)
 musicChannel2 = mixer.Channel(1)
 floweySound = mixer.Sound("Sound/characters/flowey.ogg")
 floweyTheme = mixer.Sound("Sound/themes/flowey.ogg")
-pellets = False
+screenVar = False
+screenshot = screen.copy()
 X,Y=0,1
 heart = [475,600,50,50]
 heartRect = Rect(heart[X],heart[Y],50,50)
@@ -59,8 +60,7 @@ def addPics(name,start,end):
 
 pics=[addPics('guy',1,3),addPics("guy",4,6),addPics('guy',7,9),addPics('guy',10,12)]
 
-def moveHeart():
-    global heart
+def moveHeart(heart):
     keys = key.get_pressed()
     if (keys[K_a] or keys[K_LEFT]):
         if heart[X]>=305:
@@ -75,40 +75,42 @@ def moveHeart():
         if heart[Y]<=615:
             heart[Y]+=5
 
-def drawScene(count,textCount,fx,fy,text,k,j,i,screenVar,floweyScript):  
+def drawFloweyScene(count,fx,fy,text,k,j,i,floweyScript,heart):
+    global screenVar
+    global screenshot
     screen.blit(floweyCombat,(0,0))
+    screen.blit(heartPic,(heart[X]-25,heart[Y]-25))
     if screenVar:
         screen.blit(screenshot,(600,175))
-    if int(count)%6 == 0:
+    if count % 30 == 0 and text:
         screen.blit(floweyTalking,(389,155))
-    if int(count)%15 == 0:
-        musicChannel.play(floweyTalking)
-    if not musicChannel2.get_busy():
-        musicChannel2.play(floweyTheme)
     else:
         screen.blit(normalFlowey,(389,155))
-    if textCount % 20 == 0 and text:
-        character = consolas.render(floweyScript[k][j][i],BLACK,True)
-        screen.blit(character,(fx,fy))
-        screenshot = screen.copy().subsurface(600,175,362,171)
-        screenVar = True
-    screen.blit(heartPic,(heart[X]-25,heart[Y]-25))
+    if text:
+##        if count % 100 == 0:
+##            musicChannel.play(floweySound)
+##        if not musicChannel2.get_busy():
+##            musicChannel2.play(floweyTheme)
+        if count % 12 == 0:
+            character = consolas.render(floweyScript[k][j][i],True,WHITE)
+            screen.blit(character,(fx,fy))
+            screenVar = True
     display.flip()
+    screenshot = screen.copy().subsurface(600,175,362,171)
 
 def floweyFight():
     hp = 20
-    textCount = 0
     count = 0
     i = 0
     j = 0
     k = 0
     fx = 650
-    fy = 195
+    fy = 200
     x = 0
     floweyScript = make3D(floweyText)
-    screenVar = False
     text = True
     running = True
+#600 175
     while running:
         for evt in event.get():
             if evt.type==QUIT:
@@ -117,30 +119,34 @@ def floweyFight():
         mx,my = mouse.get_pos()
         mb = mouse.get_pressed()
         keys = key.get_pressed()
-        
-        moveHeart()
-        drawScene(count,textCount,fx,fy,text,k,j,i,screenVar,floweyScript)
-        count+=0.1
-        textCount+=1
-        if fx>=730:
+        moveHeart(heart)
+        drawFloweyScene(count,fx,fy,text,k,j,i,floweyScript,heart)
+        count+=1
+        if fx>=925:
             fx = 650
             fy+=35
-        if i+1 == len(floweyScript[k][j]):
-            i = 0
-            j+=1
         else:
-            i+=1
-        if j+1 == len(floweyScript[k]):
-            k+=1
-            j = 0
-            i = 0
-        else:
-            j+=1
-        if not k+1 == len(floweyScript):
-            k+=1
-        else:
-            text = False
-            
+            if count % 12 == 0: 
+                fx+=15
+        if count % 12 == 0:
+            if not i+1 == len(floweyScript[k][j]):
+                i+=1
+            else:
+                i = 0
+                if not j+1 == len(floweyScript[k]):
+                    j+=1
+                    fx+=18
+                else:
+                    j = 0
+                    if not k+1 == len(floweyScript):
+                        k+=1
+                        fx = 650
+                        fy = 200
+                        screenVar = False
+                    else:
+                        k = 0
+                        text = False
+                    
 floweyFight()
 running=True
 while running:
