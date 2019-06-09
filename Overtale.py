@@ -36,10 +36,11 @@ MOVEUP=19
 #           (x,y) #Scene#, Max x and Y
 #                          coordinates
 #                           for scene
-guy = [X,Y,480,400,S,0,MAXX,2267,MAXY,800,MINX,-480,MINY,-400,MOVEL,-190,MOVER,1220,MOVEUP,-50]
-                                                                                            #GX GY SX  SY  MX   MX  MY MOVEL MOVER MAXX MAXY
-scenes=[[0,0,480,400,1490,1630,41,-190,1220,2267,800],[0,600,480,400,1,1000,550,0,0,460,930],[0,600,480,400,1,1000,550,0,0,460,930]]
-#resets=(
+guy = [X,Y,480,400,S,2,MAXX,2267,MAXY,800,MINX,-480,MINY,-400,MOVEL,-190,MOVER,1220,MOVEUP,-50]
+                                                                                                                                                                                                                                                                                                                                                                                                                                #GX GY SX  SY  MX   MX  MY MOVEL MOVER MAXX MAXY
+scenes=[[0,0,480,400,1490,1630,41,-190,1220,2267,800,-50],[0,600,480,400,-50,40,20,0,0,460,930,-50],[0,600,480,400,-50,40,20,0,0,460,930,-50],[10,650,480,650,-30,30,-310,0,-10,460,650,-1000],[0,0,450,500,-60,20,-220,1,1000,460,1000,1],[0,0,400,650,1780,1800,1000,1,1270,2400,2300,1],[0,0,0,450,400,540,-220,1,0,2400,2300,1],[0,0,400,650,3260,3360,1000,1,2720,2400,2300,1],[0,20,20,450,3480,3500,1000,1,2560,2400,2300,60],[0,0,20,300,900,1000,1000,1,-1,2400,800,0],[0,0,500,630,900,1000,1000,1,1000,2400,800,1]]
+print('GX GY SX  SY  MX   MX  MY MOVEL MOVER MAXX MAXY')
+pprint(scenes)
 move=0
 frame=0
 #initializing font
@@ -88,7 +89,7 @@ def checkCombat():
     return False
 #backPics=[]
 backPics=addPics('back',1,21)
-maskPics=addPics('mask',1,2)
+maskPics=addPics('mask',1,21)
 #maskPics=[]
 #unloadedPics=["Pictures/back/back1.png",'Pictures/back/back2.png']
 #unloadedMaskPics=['Pictures/mask/mask1.png','Pictures/mask/mask2.png']
@@ -224,40 +225,54 @@ def transCool(width,height,col):
             time.wait(5)
             display.flip()
     fade(width,height,BLACK)
-        
+casex=casey=0
+difx=dify=0
 def moveGuy(guy,writing):
-    
-    global move,frame
+    #print(guy[2],guy[3])
+    global move,frame,casex,casey,difx,dify
+    difx=guy[X]-guy[2]
+    dify=guy[Y]-guy[3]
+    #print(guy[X],guy[Y],casex,casey)
     newMove=-1
     keys = key.get_pressed()
     #print(guy[S],len(backPics))
     if writing:
-        if (keys[K_a] or keys[K_LEFT]) and guy[X]>-480:
-            if checkPixelY(maskPics[guy[S]],guy[X]+480-10,guy[Y]+400,guyPic.get_height(),RED):
+        if (keys[K_a] or keys[K_LEFT]):
+            # and guy[X]>-480
+            if checkPixelY(maskPics[guy[S]],guy[X]+guy[2]+casex-10,guy[Y]+guy[3]+casey,guyPic.get_height(),RED):
                 if guy[X]<=guy[MOVEL]:
                     guy[2]-=10
+                    casex+=10
                 if guy[X]>=guy[MOVER]+10:
                     guy[2]-=10
+                    casex+=10
                 guy[X]-=10
                 newMove=3
-        elif (keys[K_d] or keys[K_RIGHT]) and guy[X]<guy[MAXX]:
-            if checkPixelY(maskPics[guy[S]],guy[X]+480+60,guy[Y]+400,guyPic.get_height(),RED):
+        elif (keys[K_d] or keys[K_RIGHT]):
+            # and guy[X]<guy[MAXX]
+            if checkPixelY(maskPics[guy[S]],guy[X]+guy[2]+casex+60,guy[Y]+guy[3]+casey,guyPic.get_height(),RED):
                 if guy[X]<=guy[MOVEL]-10:
                     guy[2]+=10
+                    casex-=10
                 if guy[X]>=guy[MOVER]:
                     guy[2]+=10
+                    casex-=10
                 guy[X]+=10
                 newMove=0
-        elif (keys[K_w] or keys[K_UP]) and guy[Y]>-480:
-            if checkPixelX(maskPics[guy[S]],guy[X]+480,guy[Y]-10+400,guyPic.get_width(),RED):
+        elif (keys[K_w] or keys[K_UP]):
+            # and guy[Y]>-480
+            if checkPixelX(maskPics[guy[S]],guy[X]+guy[2]+casex,guy[Y]-10+guy[3]+casey,guyPic.get_width(),RED):
                 if guy[Y]<=guy[MOVEUP]:
                     guy[3]-=10
+                    casey+=10
                 guy[Y]-=10
                 newMove=2
-        elif (keys[K_s] or keys[K_DOWN]) and guy[Y]<guy[MAXY]:
-            if checkPixelX(maskPics[guy[S]],guy[X]+480,guy[Y]+400+82,guyPic.get_width(),RED):
+        elif (keys[K_s] or keys[K_DOWN]):
+            # and guy[Y]<guy[MAXY]
+            if checkPixelX(maskPics[guy[S]],guy[X]+guy[2]+casex,guy[Y]+guy[3]+casey+82,guyPic.get_width(),RED):
                 if guy[Y]<=guy[MOVEUP]-10:
                     guy[3]+=10
+                    casey-=10
                 guy[Y]+=10
                 newMove=1
         else:
@@ -314,51 +329,67 @@ def floweyEncounter(picsList,guy,mono2):
     
 mono2=True
 def heartPhase(guy,picsList):
-    for i in range(10):
+    for i in range(5):
         screen.fill(BLACK)
-        time.wait(100)
+        time.wait(200)
         display.flip()
-        screen.blit(picsList[2][0],(guy[2],guy[3]))
-        time.wait(100)
+        screen.blit(picsList[2][0],(guy[2]-2*i,guy[3]-2*i))
+        time.wait(200)
         display.flip()
         screen.fill(BLACK)
-        time.wait(100)
+        time.wait(200)
         display.flip()
-        screen.blit(heartPic,(guy[2]+5,guy[3]+5))
+        screen.blit(heartPic,(guy[2]+5-2*i,guy[3]+5-2*i))
         
         
         
         display.flip()
         
 def drawScene(screen,picsList,backPics,guy,combat):
-    global mono2
+    global mono2,casex,casey
+    #screen.fill(BLACK)
+    #print(guy[X],guy[Y],guy[2],guy[3])
+    print(guy[X],guy[Y],guy[2],guy[3],guy[MOVER],guy[MOVEUP],guy[MOVEL])
     mono=False
-    if guy[X]<=-190 and guy[Y]<=-50:#the rest of the lines are chekcing where the character is, because if they are too far into one part of the scene we want to move the CHARACTER and NOT the background picture
-        screen.blit(backPics[guy[S]],(190,50))
-
-    elif scenes[guy[S]][4]<guy[X]<scenes[guy[S]][5] and guy[Y]<scenes[guy[S]][6]:
+    
+        
+    if scenes[guy[S]][4]<guy[X]<scenes[guy[S]][5] and guy[Y]<scenes[guy[S]][6]:
         fade(1000,750,BLACK)
         guy[S]+=1
         guy[X]=scenes[guy[S]][0]
         guy[Y]=scenes[guy[S]][1]
+        #print('b',guy[X],guy[Y])
         guy[2]=scenes[guy[S]][2]
         guy[3]=scenes[guy[S]][3]
         guy[MOVEL]=scenes[guy[S]][7]
         guy[MOVER]=scenes[guy[S]][8]
         guy[MAXX]=scenes[guy[S]][9]
         guy[MAXY]=scenes[guy[S]][10]
- 
+        guy[MOVEUP]=scenes[guy[S]][11]
+        casex=casey=0
+        #guy[MOVEUP]=scenes[guy[S]][11]
+        print(1)
+    elif guy[X]<=guy[MOVEL]-10 and guy[Y]<=guy[MOVEUP]:#the rest of the lines are chekcing where the character is, because if they are too far into one part of the scene we want to move the CHARACTER and NOT the background picture
+        screen.blit(backPics[guy[S]],(-guy[MOVEL],-guy[MOVEUP]))
+        print(2)
     elif guy[X]<=guy[MOVEL]-10:
         screen.blit(backPics[guy[S]],(-(guy[MOVEL]-10),-guy[Y]))
+        print(3)
+    elif guy[X]>=guy[MOVER] and guy[Y]<=guy[MOVEUP]:
+        screen.blit(backPics[guy[S]],(-guy[MOVER],-guy[MOVEUP]))
     elif guy[X]>=guy[MOVER]:
         screen.blit(backPics[guy[S]],(-guy[MOVER],-guy[Y]))
-    elif guy[Y]<=-50:
-        screen.blit(backPics[guy[S]],(-guy[X],50))
+        print(4)
+        
+    elif guy[Y]<=guy[MOVEUP]:
+        screen.blit(backPics[guy[S]],(-guy[X],-guy[MOVEUP]))
+        print(5)
     else:
         screen.blit(backPics[guy[S]],(-guy[X],-guy[Y]))
+        print(6)
     screen.blit(picsList[move][int(frame)],(guy[2],guy[3]))
     checkEncounter(guy,mono2,picsList)
-    
+    #draw.circle(screen,RED,(gu,10)
     display.flip()
 def checkEncounter(guy,mono2,picsList):
     if guy[S]==1:
