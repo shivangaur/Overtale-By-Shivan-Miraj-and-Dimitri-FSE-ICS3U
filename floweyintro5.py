@@ -85,7 +85,7 @@ def checkCollision(heart,els):
         return True
     return False
 
-def movePellets(move,els,k,count):
+def movePellets(move,els,k,count,done):
     if move:
         if count <= 100:
             els[0][0]-= 2
@@ -96,7 +96,7 @@ def movePellets(move,els,k,count):
             els[3][1]-= 1
             els[4][1]-= 1
         else:
-            if count >= 1300:
+            if count >= 1360:
                 els[0][0] += 1
                 els[1][0] -= 1
                 els[2][0] += 1
@@ -107,33 +107,28 @@ def movePellets(move,els,k,count):
                 els[3][1] += 2
                 els[4][1] += 2
         count += 1
-    return els,count
+        if els[0][1] >= 750:
+            done = True
+    return els,count,done
 
-def update(count,fx,fy,moveText,k,j,i,text,pellets,els,pelletCount,hp):
-    script = False
+def update(count,fx,fy,moveText,k,j,i,text,pellets,els,pelletCount,hp,script,floweyScript,done):
     if checkCollision(heart,els):
         hp = 1
         pellets = False
-    if not text and not pellets:
-        if hp == 1:
-            floweyScript = make3D(open("combattext/flowey/floweydeath.txt"))
-            print("hi")
-        else:
-            print("HI")
-            floweyScript = make3D(open("combattext/flowey/floweylife.txt"))
-        script = True
+        done = True
+    count+=1
+    els,pelletCount,done = movePellets(pellets,els,k,pelletCount,done)
+    if done and not text:
+        floweyText.close()
+        floweyScript = make3D(open("combattext/flowey/floweyend.txt"))
         text = True
-        moveText = False
-        fx = 650
-        fy = 200
         i = 0
         j = 0
         k = 0
-    if not script:
-        floweyText = open("combattext/flowey/floweyintro.txt")
-        floweyScript = make3D(floweyText)
-    count+=1
-    els,pelletCount = movePellets(pellets,els,k,pelletCount)
+        fx = 650
+        fy = 200
+        count = 0
+    print(k<len(floweyScript))
     if floweyScript[k][j][i] == "~":
         if count % 12 == 0:
             fx = 650
@@ -158,12 +153,12 @@ def update(count,fx,fy,moveText,k,j,i,text,pellets,els,pelletCount,hp):
                     k+=1
                     fx = 650
                     fy = 200
-                    if k == 8:
+                    if k == 8 and not done:
                         pellets = True
                 else:
                     k = 0
                     text = False
-    return count,fx,fy,moveText,k,j,i,text,pellets,els,pelletCount,hp
+    return count,fx,fy,moveText,k,j,i,text,pellets,els,pelletCount,hp,script,floweyScript,done
 
 def drawFloweyScene(count,fx,fy,text,k,j,i,floweyScript,heart,moveText,pellets,els):
     global screenVar
@@ -213,6 +208,8 @@ def floweyFight():
     running = True
     moveText = True
     pellets = False
+    script = False
+    done = False
     els = [Rect(485,130,20,20),Rect(485,130,20,20),Rect(485,130,20,20),Rect(485,130,20,20),Rect(485,150,20,20)]
     pelletCount = 0
     while running:
@@ -225,7 +222,7 @@ def floweyFight():
         keys = key.get_pressed()
         moveHeart(heart)
         drawFloweyScene(count,fx,fy,text,k,j,i,floweyScript,heart,moveText,pellets,els)
-        count,fx,fy,moveText,k,j,i,text,pellets,els,pelletCount,hp = update(count,fx,fy,moveText,k,j,i,text,pellets,els,pelletCount,hp)      
+        count,fx,fy,moveText,k,j,i,text,pellets,els,pelletCount,hp,script,floweyScript,done = update(count,fx,fy,moveText,k,j,i,text,pellets,els,pelletCount,hp,script,floweyScript,done)      
                     
 floweyFight()
 running=True
