@@ -2,7 +2,7 @@ from pygame import *
 from math import *
 from random import *
 init()
-size = width, height = 500,500
+size = width, height = 1000,700
 screen = display.set_mode(size)
 
 backPic=image.load("Pictures/combat/papyrusFight.jpg") #4000x500
@@ -15,7 +15,7 @@ VY=2
 onGround=3
 
     #X  Y   VY onGround
-heart=[250,450,0,True]
+heart=[250,650,0,True]
 
 
 def drawScene(screen,guy):
@@ -32,18 +32,18 @@ def drawScene(screen,guy):
 def moveGuy(guy):
     
     keys=key.get_pressed()
-    
-    if guy[X]<3750:
+
+    if guy[X]<4700:
         guy[X]+=10
     
     if keys[K_UP] and guy[onGround]:#jumping only if ON GROUND
-        guy[VY]=-10 #jupming power
+        guy[VY]=-15 #jupming power
         guy[onGround]=False
         
     guy[Y]+=guy[VY]
     
-    if guy[Y]>=450:
-        guy[Y]=450   #set it on ground
+    if guy[Y]>=650:
+        guy[Y]=650   #set it on ground
         guy[VY]=0    #stop falling
         guy[onGround]=True
 
