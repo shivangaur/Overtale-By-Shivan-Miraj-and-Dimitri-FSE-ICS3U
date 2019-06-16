@@ -33,7 +33,8 @@ def moveGuy(guy):
     
     keys=key.get_pressed()
     
-    guy[X]+=10
+    if guy[X]<3750:
+        guy[X]+=10
     
     if keys[K_UP] and guy[onGround]:#jumping only if ON GROUND
         guy[VY]=-10 #jupming power
