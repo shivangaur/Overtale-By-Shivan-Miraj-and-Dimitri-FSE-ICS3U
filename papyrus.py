@@ -5,7 +5,7 @@ init()
 size = width, height = 500,500
 screen = display.set_mode(size)
 
-backPic=image.load("back.jpg") #4000x500
+backPic=image.load("Pictures/combat/papyrusFight.jpg") #4000x500
 guyPic=image.load("Pictures/heart.png")#29x31
 
 X=0
