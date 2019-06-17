@@ -19,7 +19,7 @@ Y=1
 
 gameOver=image.load("Pictures/gameOver.png")
 
-heart=[600,650]
+heart3=[600,650]
 
 
 balls=[i*75 for i in range (0,15)] 
@@ -29,18 +29,13 @@ for ba in balls:
 
 
 
-##for ball in balls:
-##    draw.circle(screen,WHITE,ball,11)
-##
-##    #if ball[Y]>=650:
-        
-    
-
 
 
 myClock=time.Clock()
 
-def drawScene(screen,balls1,heart):
+def drawScene(screen,balls1,heart):#draws the scene
+                                   #gravity is the speed and direction
+                                   #of the balls' x and y coordinates
     gravityY=7
     gravityX=7
     screen.fill((0,0,0))
@@ -91,33 +86,41 @@ def checkCollide(guy):
 
 def gameOver():
     screen.blit(gameOver,(0,0))
-    
 
-running=True
-while running:
-    for evt in event.get():
-        if evt.type==QUIT:
+def sans():
+    myClock=time.Clock()
+    running=True
+    while running:
+        for evt in event.get():
+            if evt.type==QUIT:
+                running=False
+        drawScene(screen,balls1,heart3)
+        moveHeart(heart3)
+        checkCollide(heart3)
+
+        myClock.tick(60)
+        showTime = (time.get_ticks()-startTime)//1000
+
+        print(showTime)
+
+        if showTime >= 26:
+            print("done")
+
+        if key.get_pressed()[27]:
             running=False
-
-    showTime = (time.get_ticks()-startTime)//1000
-
-    print(showTime)
-
-    if showTime >= 26:
-        print("done")
-
-                       
-    mb=mouse.get_pressed()
-    mx,my=mouse.get_pos()
+        
     
-    drawScene(screen,balls1,heart)
-    moveHeart(heart)
-    checkCollide(heart)
-    myClock.tick(60)
-    display.flip() 
-page = "main"
+        display.flip()
+    return "m"
 
-if page == "game over":
-    gameOver()
+
+page = "m"
+while page!="exit":
+    if page == "m":
+        page = sans()
+    
+
+
+
 
 quit()

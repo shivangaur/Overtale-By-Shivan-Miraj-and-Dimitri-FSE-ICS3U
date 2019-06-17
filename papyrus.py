@@ -19,68 +19,67 @@ BACKX=4
 onGround=3
 
     #X  Y   VY onGround BACKGROUND
-heart=[250,650,0,True, 0]
+heart1=[250,650,0,True, 0]
 
 
 
-def drawScene(screen,guy):
-    #rec=Rect(250,guy[Y],29,31)
-    screen.blit(backPic,(guy[BACKX],0))
-    #screen.blit(heartPic,(guy[X],guy[Y]))
-    offset=250-guy[X]
-
-    
-    display.flip()
-
-
-
-def moveGuy(guy):
-    
-    keys=key.get_pressed()
-
-    if guy[BACKX] > -4700:
-        guy[BACKX]-=10
-
-    if keys[K_UP] and guy[onGround]:#jumping only if ON GROUND
-        guy[VY]=-15 #jupming power
-        guy[onGround]=False
+def papyrus():
+    myClock=time.Clock()
+    running=True
+    while running:
+        for evnt in event.get():          
+            if evnt.type == QUIT:
+                return "exit"
         
-    guy[Y]+=guy[VY]
+        screen.blit(backPic,(heart1[BACKX],0))
+        #screen.blit(heartPic,(guy[X],guy[Y]))
+        offset=250-heart1[X]
+            
+        keys=key.get_pressed()
+
+        if heart1[BACKX] > -4700:
+            heart1[BACKX]-=10   #the background is what is moving
+
+        if keys[K_UP] and heart1[onGround]:#jumping only if ON GROUND
+            heart1[VY]=-15 #jupming power
+            heart1[onGround]=False                
+        heart1[Y]+=heart1[VY]
+            
+        if heart1[Y]>=650:
+            heart1[Y]=650   #set it on ground
+            heart1[VY]=0    #stop falling
+            heart1[onGround]=True
+
+        heart1[VY]+=0.7 #apply gravity
+
+
+        collideCenter = (int(heart1[X]) + 25, int(heart1[Y] + 25))
+        if screen.get_at(collideCenter) == WHITE:
+            print("ur ded")
+
+        if screen.get_at(collideCenter) == (128,255,255):
+            print("u win")
+
+
+        screen.blit(heartPic, (heart1[X], heart1[Y]))
+
+        myClock.tick(60)
+        
+        if key.get_pressed()[27]:
+            running=False
+            
+        display.flip()
+    return "m"
     
-    if guy[Y]>=650:
-        guy[Y]=650   #set it on ground
-        guy[VY]=0    #stop falling
-        guy[onGround]=True
-
-    guy[VY]+=0.7 #apply gravity
+        
 
 
-    display.flip()
-
-def checkCollide(guy):
-    X, Y = 0, 1
-    count=0
-    collideCenter = (int(heart[X]) + 25, int(heart[Y] + 25))
-    if screen.get_at(collideCenter) == WHITE:
-        print("ur ded")
-
-    if screen.get_at(collideCenter) == (128,255,255):
-        print("u win")
+page= "m"
+while page!="exit":
+    if page == "m":
+        page = papyrus()
 
 
-    screen.blit(heartPic, (guy[X], guy[Y]))
-    display.flip()
 
 
-running = True         
-myClock = time.Clock()
-while running:
-    for evnt in event.get():                
-        if evnt.type == QUIT:
-            running = False
-    moveGuy(heart)
-    drawScene(screen,heart)
-    checkCollide(heart)
-    #checkCollision(guy,plats)
-    myClock.tick(60) 
 quit()

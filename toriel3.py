@@ -11,7 +11,7 @@ heartPic=image.load("Pictures/heart.png")
 
 badPic=image.load("Pictures/combat/torielFightSpikes.png")
 
-heart=[500,335,0,True, 0]
+heart2=[500,335,0,True, 0]
 
 BLACK=(0,0,0)
 
@@ -26,12 +26,10 @@ myClock = time.Clock()
 myClock.tick(60)
 
 
-def moveBadGuys(badGuys, goodX, goodY):
-    ''' The AI for the badGuys is real simple. If the goodGuy is left/right
-        they move left/right. Same with up/down.
-        badGuys - A list of bad guy positions ([x,y] lists)
-        goodX, goodY - good guy position
-    '''
+def moveBadGuys(badGuys, goodX, goodY): #the enemy balls (put in the
+                                        #badguys list) will follow the
+                                        #heart's position (goodX,goodY)
+
     for guy in badGuys:
         if goodX > guy[0]:
             guy[0]+=3                   
@@ -42,18 +40,16 @@ def moveBadGuys(badGuys, goodX, goodY):
         elif goodY < guy[1]-25:
             guy[1]-=3
 
-def drawScene(screen, badGuys, goodX, goodY):
-    ''' The scene is very simple. Each bad guy is a red circle, and the good guy is
-        a green circle.
-    '''
+def drawScene(screen, badGuys, goodX, goodY):#draws the heart and background
+
     screen.fill((0,0,0))
     for guy in badGuys:
         draw.circle(screen, WHITE, guy, 10)
 
-    screen.blit(heartPic,(heart[X],heart[Y]))
+    screen.blit(heartPic,(heart2[X],heart2[Y]))
     display.flip
     
-def moveHeart(heart):
+def moveHeart(heart):#keys used to move the heart
     keys = key.get_pressed()
     if (keys[K_a] or keys[K_LEFT]):
         if heart[X]>=50:
@@ -70,35 +66,56 @@ def moveHeart(heart):
 
 
 
-def checkCollide(guy):
+def checkCollide(guy): #checks if the heart collides with
+                       #any white areas
     X, Y = 0, 1
     count=0
     collideCenter = (int(guy[X]), int(guy[Y]))
     if screen.get_at(collideCenter) == WHITE:
         print("ur ded")
 
+def toriel():
+    myClock=time.Clock()
+    running=True
+    while running:
+        for evt in event.get():
+            if evt.type==QUIT:
+                running=False
+        moveHeart(heart2)
+        drawScene(screen,badGuys,heart2[X]+25,heart2[Y]-25)
+        moveBadGuys(badGuys, heart2[X], heart2[Y])
+        checkCollide(heart2)
+
+        myClock.tick(60)
+        showTime = (time.get_ticks()-startTime)//1000
+
+        print(showTime)
+
+        if key.get_pressed()[27]:
+            running=False
+
+        
+
+        display.flip()
+    return "m"
+        
+
 #def badGuys
 
 
-running=True
-while running:
-    for evt in event.get():
-        if evt.type==QUIT:
-            running=False
 
-    showTime = (time.get_ticks()-startTime)//1000
 
-    print(showTime)
+##    moveHeart(heart2)
+##    drawScene(screen,badGuys,heart2[X]+25,heart2[Y]-25)
+##    moveBadGuys(badGuys, heart2[X], heart2[Y])
+##    checkCollide(heart2)
 
-    moveHeart(heart)
-    drawScene(screen,badGuys,heart[X]+25,heart[Y]-25)
-    moveBadGuys(badGuys, heart[X], heart[Y])
-    checkCollide(heart)
-                       
-    mb=mouse.get_pressed()
-    mx,my=mouse.get_pos()
 
-    myClock.tick(60)
-    display.flip() 
+page = "m"
+while page != "exit":
+    if page == "m":
+        page=toriel()
+
+
 
 quit()
