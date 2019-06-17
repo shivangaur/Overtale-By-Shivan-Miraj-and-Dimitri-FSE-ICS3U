@@ -16,6 +16,11 @@ musicChannel = mixer.Channel(0)
 musicChannel2 = mixer.Channel(1)
 floweySound = mixer.Sound("Sound/characters/flowey.ogg")
 floweyTheme = mixer.Sound("Sound/themes/flowey.ogg")
+floweyLaugh = mixer.Sound("Sound/characters/floweyLaugh.ogg")
+torielSound = mixer.Sound("Sound/characters/toriel.ogg")
+floweyIntro = open("combattext/flowey/floweyintro.txt")
+floweyEnd = open("combattext/flowey/floweyend.txt")
+floweyToriel = open("combattext/flowey/floweytoriel.txt")
 screenVar = False
 screenshot = screen.copy()
 X,Y=0,1
@@ -25,12 +30,14 @@ i = 0
 heart = [475,600,50,50]
 heartRect = Rect(heart[X],heart[Y],50,50)
 heartPic=image.load("Pictures/heart.png")
+torielPic = transform.scale(image.load("Pictures/toriel/Toriel22.png"),(225,225))
 normalFlowey = image.load("Pictures/flowey/flowey.jpg")
 guy=[X,Y,480,400]
 heart=[460,450,50,50]
 floweyCombat = image.load("Pictures/combat/floweyfight.jpg")
-floweyText = open("combattext/flowey/floweyintro.txt")
 floweyTalking = image.load("Pictures/flowey/floweyTalking.jpg")
+floweyLaughing = image.load("Pictures/flowey/floweyLaughing.png")
+fireballPic = transform.scale(image.load("Pictures/combat/fireball.png"),(50,50))
 textBox = image.load("Pictures/combat/text.jpg")
 fightBox = image.load("Pictures/combat/fightBox.png")
 
@@ -50,6 +57,10 @@ def make3D(text):
         box.append(sentence)
         sentence = []
     return box
+
+floweyIntroScript = make3D(floweyIntro)
+floweyEndScript = make3D(floweyEnd)
+floweyTorielScript = make3D(floweyToriel)
 
 def addPics(name,start,end):
     '''this function will return a LIST OF PICTURES
@@ -77,6 +88,8 @@ def moveHeart(heart):
     if (keys[K_s] or keys[K_DOWN]):
         if heart[Y]<=615:
             heart[Y]+=5
+    if keys[K_ESCAPE]:
+        quit()
 
 def checkCollision(heart,els):
     if els[0].colliderect(heart) or els[1].colliderect(heart) \
@@ -85,7 +98,7 @@ def checkCollision(heart,els):
         return True
     return False
 
-def movePellets(move,els,k,count,done):
+def movePellets(move,els,k,count,done,graphic,torielBool,torielRect,fireballRect):
     if move:
         if count <= 100:
             els[0][0]-= 2
@@ -109,35 +122,39 @@ def movePellets(move,els,k,count,done):
         count += 1
         if els[0][1] >= 750:
             done = True
-    return els,count,done
+            pellets = False
+    if graphic:
+        if not torielBool:
+            if fireballRect[0] >= 580:
+                fireballRect[0] -= 3
+                screen.blit(floweyLaughing,(389,155))
+                display.flip()
+            else:
+                torielBool = True
+        else:
+            torielRect[0] -= 3
+    return els,count,done,graphic,torielBool,torielRect,fireballRect
 
-def update(count,fx,fy,moveText,k,j,i,text,pellets,els,pelletCount,hp,script,floweyScript,done):
+def update(count,fx,fy,moveText,k,j,i,text,pellets,els,pelletCount,script,floweyScript,done,running,graphic,torielBool,torielRect,fireballRect):
     if checkCollision(heart,els):
-        hp = 1
         pellets = False
         done = True
-    count+=1
-    els,pelletCount,done = movePellets(pellets,els,k,pelletCount,done)
-    if done and not text:
-        floweyText.close()
-        floweyScript = make3D(open("combattext/flowey/floweyend.txt"))
+    if pellets == False:
         text = True
-        i = 0
-        j = 0
-        k = 0
-        fx = 650
-        fy = 200
-        count = 0
-    print(k<len(floweyScript))
-    if floweyScript[k][j][i] == "~":
-        if count % 12 == 0:
-            fx = 650
-            fy += 35
-            moveText = False
+    count+=1
+    els,pelletCount,done,graphic,torielBool,torielRect,fireballRect = movePellets(pellets,els,k,pelletCount,done,graphic,torielBool,torielRect,fireballRect)
+    if k < len(floweyScript):
+        if j < len(floweyScript[k]):
+            if i < len(floweyScript[k][j]):
+                if floweyScript[k][j][i] == "~":
+                    if count % 12 == 0:
+                        fx = 650
+                        fy += 35
+                        moveText = False
     if moveText:
         if count % 12 == 0:
-            fx+=15
-    if count % 12 == 0:
+            fx+=15  
+    if count % 12 == 0 and text:
         if not i+1 == len(floweyScript[k][j]):
             i+=1
             moveText = True
@@ -158,58 +175,116 @@ def update(count,fx,fy,moveText,k,j,i,text,pellets,els,pelletCount,hp,script,flo
                 else:
                     k = 0
                     text = False
-    return count,fx,fy,moveText,k,j,i,text,pellets,els,pelletCount,hp,script,floweyScript,done
+                    if floweyScript == floweyIntroScript:
+                        floweyScript = floweyEndScript
+                    elif floweyScript == floweyEndScript:
+                        floweyScript = floweyTorielScript
+                        graphic = True
+                    elif floweyScript == floweyTorielScript:
+                        running = False
+    if torielRect[0] <= 379:
+        graphic = False
+        text = True
+    moveText = True
+    return count,fx,fy,moveText,k,j,i,text,pellets,els,pelletCount,script,floweyScript,done,running,graphic,torielBool,torielRect,fireballRect
 
-def drawFloweyScene(count,fx,fy,text,k,j,i,floweyScript,heart,moveText,pellets,els):
+def drawFloweyScene(count,fx,fy,text,k,j,i,floweyScript,heart,moveText,pellets,els,graphic,torielBool,torielRect,fireballRect,done):
     global screenVar
     global screenshot
     screen.blit(floweyCombat,(0,0))
-    draw.rect(screen,BLACK,(0,650,1000,100))
-    screen.blit(textBox,(600,175))
-    screen.blit(heartPic,(heart[X]-25,heart[Y]-25))
+    if not graphic:
+        screen.blit(textBox,(600,175))
+    else:
+        if not text:
+            draw.rect(screen,BLACK,(600,175,400,250))
     if pellets:
         draw.ellipse(screen,WHITE,els[0])
         draw.ellipse(screen,WHITE,els[1])
         draw.ellipse(screen,WHITE,els[2])
         draw.ellipse(screen,WHITE,els[3])
-        draw.ellipse(screen,WHITE,els[4]) 
+        draw.ellipse(screen,WHITE,els[4])
+    if graphic:
+        screen.blit(floweyCombat,(0,0))
+        if not torielBool:
+            screen.blit(fireballPic,(fireballRect[0],205))
+            screen.blit(floweyLaughing,(389,155))
+        else:
+            screen.blit(torielPic,(torielRect[0],120))
     if j == 0 and i == 0 and count % 12 == 0:
         screen.blit(textBox,(600,175))
     else:
         if screenVar:
-            screen.blit(screenshot,(600,175))
-    if count % 30 == 0 and text:
-        screen.blit(floweyTalking,(389,155))
+            if not graphic:
+                screen.blit(screenshot,(600,175))
+    if not floweyScript == floweyEndScript:
+        if not torielBool:
+            if graphic:
+                screen.blit(floweyLaughing,(389,155))
+            elif count % 30 == 0 and text:
+                screen.blit(floweyTalking,(389,155))
+            else:
+                screen.blit(normalFlowey,(389,155))
+        else:
+            if not graphic:
+                screen.blit(torielPic,(torielRect[0],120))
     else:
+        if done:
+            screen.blit(floweyLaughing,(389,155))
+            if count % 300 == 0 and not graphic:
+                musicChannel.play(floweyLaugh)
+    if pellets and not done:
         screen.blit(normalFlowey,(389,155))
-    if text:
-##        if count % 100 == 0:
-##            musicChannel.play(floweySound)
-##        if not musicChannel2.get_busy():
-##            musicChannel2.play(floweyTheme)
+    screen.blit(heartPic,(heart[X]-25,heart[Y]-25))
+    if done == True:
+        musicChannel2.pause()
+    if text and not graphic:
+        if count % 100 == 0:
+            if not torielBool:
+                if floweyScript == floweyEndScript:
+                    if k > 0 or j >= 1:
+                        musicChannel.play(floweySound)
+                else:
+                    musicChannel.play(floweySound)
+            else:
+                if k >= 1:
+                    musicChannel.play(torielSound)
+        if not musicChannel2.get_busy():
+            musicChannel2.play(floweyTheme)
         if count % 12 == 0:
-            if floweyScript[k][j][i] != "~":
-                character = consolas.render(floweyScript[k][j][i],True,BLACK)
-                screen.blit(character,(fx,fy))
-                screenVar = True
+            if k < len(floweyScript):
+                if j < len(floweyScript[k]):
+                    if i < len(floweyScript[k][j]):
+                        if floweyScript[k][j][i] != "~":
+                            character = consolas.render(floweyScript[k][j][i],True,BLACK)
+                            screen.blit(character,(fx,fy))
+                            screenVar = True
+                            if floweyScript == floweyEndScript:
+                                moveText = True
     display.flip()
+    if not text:
+        musicChannel.pause()
+    else:
+        musicChannel.unpause()
     screenshot = screen.copy().subsurface(600,175,362,171)
 
 def floweyFight():
-    hp = 20
     count = 0
     i = 0
     j = 0
     k = 0
     fx = 650
     fy = 200
-    floweyScript = make3D(floweyText)
     text = True
     running = True
     moveText = True
     pellets = False
     script = False
     done = False
+    graphic = False
+    torielBool = False
+    floweyScript = floweyIntroScript
+    torielRect = [1000,100]
+    fireballRect = [1000,205]
     els = [Rect(485,130,20,20),Rect(485,130,20,20),Rect(485,130,20,20),Rect(485,130,20,20),Rect(485,150,20,20)]
     pelletCount = 0
     while running:
@@ -221,10 +296,11 @@ def floweyFight():
         mb = mouse.get_pressed()
         keys = key.get_pressed()
         moveHeart(heart)
-        drawFloweyScene(count,fx,fy,text,k,j,i,floweyScript,heart,moveText,pellets,els)
-        count,fx,fy,moveText,k,j,i,text,pellets,els,pelletCount,hp,script,floweyScript,done = update(count,fx,fy,moveText,k,j,i,text,pellets,els,pelletCount,hp,script,floweyScript,done)      
-                    
+        drawFloweyScene(count,fx,fy,text,k,j,i,floweyScript,heart,moveText,pellets,els,graphic,torielBool,torielRect,fireballRect,done)
+        count,fx,fy,moveText,k,j,i,text,pellets,els,pelletCount,script,floweyScript,done,running,graphic,torielBool,torielRect,fireballRect = update(count,fx,fy,moveText,k,j,i,text,pellets,els,pelletCount,script,floweyScript,done,running,graphic,torielBool,torielRect,fireballRect)                                                                                                                                                                    
+    return "x"              
 floweyFight()
+
 running=True
 while running:
     for evt in event.get():
@@ -233,6 +309,9 @@ while running:
         
     mb=mouse.get_pressed()
     mx,my=mouse.get_pos()
-floweyText.close()
+    
+floweyIntro.close()
+floweyEnd.close()
+floweyToriel.close()
 quit()
  
