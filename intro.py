@@ -86,7 +86,7 @@ def checkSkip(running,keys):
     if keys[K_RETURN]:
         running = False
     return running
-def update(count,k,j,i,fx,fy,running,script,moveText,switch,picture):
+def updateIntro(count,k,j,i,fx,fy,running,script,moveText,switch,picture):
     '''
     fuinction that updates all variables that need to be updated
     '''
@@ -157,7 +157,7 @@ def intro():
         myClock.tick(60) # 60 fps
         running = checkSkip(running,keys)
         running = drawIntroScene(count,k,j,i,fx,fy,script,introPics,picture,running) # drawing scene
-        count,k,j,i,fx,fy,running,moveText,switch,picture = update(count,k,j,i,fx,fy,running,script,moveText,switch,picture) # updating variables
+        count,k,j,i,fx,fy,running,moveText,switch,picture = updateIntro(count,k,j,i,fx,fy,running,script,moveText,switch,picture) # updating variables
     text.close() # closing the script
     return "intro" # returning the next part of the game
 intro()

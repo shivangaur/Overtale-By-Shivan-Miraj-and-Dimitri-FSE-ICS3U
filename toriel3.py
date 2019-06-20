@@ -9,16 +9,23 @@ screen = display.set_mode(size)
 
 heartPic=image.load("Pictures/heart.png")
 
-badPic=image.load("Pictures/combat/torielFightSpikes.png")
+
+
 
 heart2=[500,335,0,True, 0]
+
+
 
 BLACK=(0,0,0)
 
 WHITE=(255,255,255)
 
+
 X=0
 Y=1
+VY=2
+BACKX=4
+onGround=3
 
 badGuys = [[0,0], [200,0], [400,0], [600, 0],[800, 0],[1000, 0]]
 
@@ -40,7 +47,7 @@ def moveBadGuys(badGuys, goodX, goodY): #the enemy balls (put in the
         elif goodY < guy[1]-25:
             guy[1]-=3
 
-def drawScene(screen, badGuys, goodX, goodY):#draws the heart and background
+def drawTorielFight(screen, badGuys, goodX, goodY):#draws the heart and background
 
     screen.fill((0,0,0))
     for guy in badGuys:
@@ -66,7 +73,7 @@ def moveHeart(heart):#keys used to move the heart
 
 
 
-def checkCollide(guy): #checks if the heart collides with
+def checkCollideToriel(guy): #checks if the heart collides with
                        #any white areas
     X, Y = 0, 1
     count=0
